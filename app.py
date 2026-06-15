@@ -302,12 +302,38 @@ SCOPES = [
     'openid'
 ]
 
+def get_google_client_config():
+    """Build Google OAuth client config from env vars or credentials.json file."""
+    client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    client_secret = os.environ.get("GOOGLE_CLIENT_SECRET")
+    if client_id and client_secret:
+        return {
+            "web": {
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "redirect_uris": [get_redirect_uri()]
+            }
+        }
+    # Fallback to local file for local development
+    with open('credentials.json', 'r') as f:
+        return json.load(f)
+
+def get_redirect_uri():
+    """Return the correct redirect URI based on environment."""
+    render_url = os.environ.get("RENDER_EXTERNAL_URL")
+    if render_url:
+        return f"{render_url}/oauth2callback"
+    return 'http://127.0.0.1:3000/oauth2callback'
+
 @app.route("/login/google")
 def login_google():
-    flow = Flow.from_client_secrets_file(
-        'credentials.json',
+    flow = Flow.from_client_config(
+        get_google_client_config(),
         scopes=SCOPES,
-        redirect_uri='http://127.0.0.1:3000/oauth2callback'
+        redirect_uri=get_redirect_uri()
     )
     
     authorization_url, state = flow.authorization_url(
@@ -324,11 +350,11 @@ def login_google():
 def oauth2callback():
     state = session.get('state')
     
-    flow = Flow.from_client_secrets_file(
-        'credentials.json',
+    flow = Flow.from_client_config(
+        get_google_client_config(),
         scopes=SCOPES,
         state=state,
-        redirect_uri='http://127.0.0.1:3000/oauth2callback'
+        redirect_uri=get_redirect_uri()
     )
     
     flow.code_verifier = session.get('code_verifier')
