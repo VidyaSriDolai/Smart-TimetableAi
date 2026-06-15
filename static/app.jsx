@@ -62,7 +62,7 @@ function MarkdownRenderer({ text }) {
 }
 
 function App() {
-    const API = "";
+    const API = "https://smart-timetableai.onrender.com";
     // Helper to format Date as YYYY-MM-DD
     const getTodayDateStr = () => {
         const today = new Date();
