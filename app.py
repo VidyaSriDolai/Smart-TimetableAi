@@ -13,7 +13,7 @@ import uuid
 
 
 app = Flask(__name__)
-CORS(app, origins=["https://smart-timetableai.onrender.com", "http://127.0.0.1:3000", "http://localhost:3000"])
+CORS(app, origins=["https://smart-timetableai.onrender.com", "https://smart-time-tableai.netlify.app", "http://127.0.0.1:3000", "http://localhost:3000"])
 app.secret_key = "smart_timetable_session_secret_key"
 
 # Enable dynamic insecure OAuth transport for local development (so HTTP loopback redirect works)
