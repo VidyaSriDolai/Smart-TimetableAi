@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_file, session, redirect
+from flask_cors import CORS
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
@@ -12,6 +13,7 @@ import uuid
 
 
 app = Flask(__name__)
+CORS(app, origins=["https://smart-timetableai.onrender.com", "http://127.0.0.1:3000", "http://localhost:3000"])
 app.secret_key = "smart_timetable_session_secret_key"
 
 # Enable dynamic insecure OAuth transport for local development (so HTTP loopback redirect works)
