@@ -11,7 +11,9 @@ import urllib.parse
 import uuid
 
 
+from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__, static_folder='static', template_folder='.')
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 from flask_cors import CORS
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 app.secret_key = "smart_timetable_session_secret_key"
