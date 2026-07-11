@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Timetable AI</title>
+    
+    <!-- Google Fonts for Premium Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- React 18, ReactDOM 18 CDNs (Using Cloudflare's ultra-fast cdnjs edge servers) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS Stylesheet -->
+    <link rel="stylesheet" href="/static/style.css?v=1.0.5">
+</head>
+<body>
+    <!-- DOM Entry Root for React Rendering -->
+    <div id="root"></div>
+
+    <!-- Dynamic Smart Timetable Self-Caching JSX Engine Launcher -->
+    <script>
+        (async function() {
+            const SOURCE_URL = "/static/app.jsx?v=" + Date.now();
+            const CACHE_KEY_PREFIX = "smart_timetable_jsx_";
+            
+            try {
+                // 1. Fetch the app.jsx file source
+                const response = await fetch(SOURCE_URL);
+                if (!response.ok) throw new Error("Failed to fetch app.jsx");
+                const sourceCode = await response.text();
+                
+                // 2. Simple hash function to detect file changes
+                let hash = 0;
+                for (let i = 0; i < sourceCode.length; i++) {
+                    const char = sourceCode.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32bit integer
+                }
+                const sourceHash = String(hash);
+                
+                const cachedHash = null; // Force cache miss for now
+                const cachedCode = null; // Force cache miss for now
+                
+                if (false) {
+                    // Cache HIT! Evaluate the compiled JavaScript instantly (0ms compile time, no Babel needed!)
+                    console.log("[JSX Engine] Cache Hit! Loading compiled JS from localStorage.");
+                    const script = document.createElement("script");
+                    script.text = cachedCode;
+                    document.body.appendChild(script);
+                } else {
+                    // Cache MISS! We need Babel to compile the new code
+                    console.log("[JSX Engine] Cache Miss. Fetching and loading Babel compiler...");
+                    
+                    // Show a modern, beautiful loading state while Babel compiles for the first time
+                    const loader = document.createElement("div");
+                    loader.id = "jsx-engine-loader";
+                    loader.style = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #f5f3ff 0%, #fff1f2 50%, #f0fdf4 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; font-family: 'Plus Jakarta Sans', sans-serif;";
+                    loader.innerHTML = `
+                        <div style="width: 48px; height: 48px; border: 4px solid rgba(139, 92, 246, 0.12); border-left-color: #8b5cf6; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
+                        <div style="font-size: 16px; font-weight: 700; color: #1e1b4b; margin-bottom: 6px;">Optimizing Timetable Engine...</div>
+                        <div style="font-size: 12.5px; color: #475569; font-weight: 500;">This will only take a second on your first visit.</div>
+                        <style>
+                            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                        </style>
+                    `;
+                    document.body.appendChild(loader);
+
+                    // Load Babel Standalone CDN dynamically
+                    const babelScript = document.createElement("script");
+                    babelScript.src = "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js";
+                    babelScript.onload = function() {
+                        try {
+                            console.log("[JSX Engine] Compiling app.jsx with Babel...");
+                            const start = performance.now();
+                            
+                            // Transpile JSX code to ES5 JavaScript
+                            const compiledCode = Babel.transform(sourceCode, { 
+                                presets: ['react'] 
+                            }).code;
+                            
+                            const duration = (performance.now() - start).toFixed(1);
+                            console.log(`[JSX Engine] Compilation successful in ${duration}ms! Caching result.`);
+                            
+                            // Save to cache
+                            localStorage.setItem(CACHE_KEY_PREFIX + "hash", sourceHash);
+                            localStorage.setItem(CACHE_KEY_PREFIX + "compiled", compiledCode);
+                            
+                            // Remove loader and mount the script
+                            document.getElementById("jsx-engine-loader")?.remove();
+                            
+                            const script = document.createElement("script");
+                            script.text = compiledCode;
+                            document.body.appendChild(script);
+                        } catch (err) {
+                            console.error("[JSX Engine] Babel transpilation failed:", err);
+                            document.getElementById("jsx-engine-loader")?.remove();
+                            // Fallback to in-browser execution
+                            const script = document.createElement("script");
+                            script.type = "text/babel";
+                            script.src = SOURCE_URL;
+                            document.body.appendChild(script);
+                        }
+                    };
+                    document.head.appendChild(babelScript);
+                }
+            } catch (error) {
+                console.error("[JSX Engine] Launcher failed:", error);
+                // Hard fallback: load Babel and app.jsx directly
+                const babelScript = document.createElement("script");
+                babelScript.src = "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js";
+                babelScript.onload = () => {
+                    const script = document.createElement("script");
+                    script.type = "text/babel";
+                    script.src = SOURCE_URL;
+                    document.body.appendChild(script);
+                };
+                document.head.appendChild(babelScript);
+            }
+        })();
+    </script>
+</body>
+</html>

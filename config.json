@@ -1,0 +1,9 @@
+{
+  "SMTP_HOST": "smtp.gmail.com",
+  "SMTP_PORT": 587,
+  "SMTP_USER": "smarttimetableai@gmail.com",
+  "SMTP_PASS": "xeysitkhwabqiuwt",
+  "SMTP_SENDER": "smarttimetableai@gmail.com",
+  "MONGODB_URI": "mongodb+srv://smarttimetableai_db_user:JmIP4WMZndvXw3Ki@cluster0.z8mxeep.mongodb.net/?appName=Cluster0",
+  "OPENROUTER_API_KEY": "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"
+}
