@@ -306,28 +306,42 @@ SCOPES = [
 
 @app.route("/login/google")
 def login_google():
-    flow = Flow.from_client_secrets_file(
-        'credentials.json',
-        scopes=SCOPES,
-        redirect_uri=url_for('oauth2callback', _external=True)
-    )
-    
-    authorization_url, state = flow.authorization_url(
-        access_type='offline',
-        include_granted_scopes='true',
-        prompt='consent'
-    )
-    
-    session['state'] = state
-    session['code_verifier'] = flow.code_verifier
-    return redirect(authorization_url)
+    try:
+        # Check if file exists first to provide better error
+        if not os.path.exists('credentials.json'):
+            if os.path.exists('/etc/secrets/credentials.json'):
+                creds_path = '/etc/secrets/credentials.json'
+            else:
+                return "ERROR: credentials.json file is completely missing from the server. Did you upload it as a Secret File correctly?", 500
+        else:
+            creds_path = 'credentials.json'
+
+        flow = Flow.from_client_secrets_file(
+            creds_path,
+            scopes=SCOPES,
+            redirect_uri=url_for('oauth2callback', _external=True)
+        )
+        
+        authorization_url, state = flow.authorization_url(
+            access_type='offline',
+            include_granted_scopes='true',
+            prompt='consent'
+        )
+        
+        session['state'] = state
+        session['code_verifier'] = flow.code_verifier
+        return redirect(authorization_url)
+    except Exception as e:
+        return f"INTERNAL SERVER ERROR during login: {str(e)}", 500
 
 @app.route("/oauth2callback")
 def oauth2callback():
     state = session.get('state')
     
+    creds_path = '/etc/secrets/credentials.json' if os.path.exists('/etc/secrets/credentials.json') else 'credentials.json'
+    
     flow = Flow.from_client_secrets_file(
-        'credentials.json',
+        creds_path,
         scopes=SCOPES,
         state=state,
         redirect_uri=url_for('oauth2callback', _external=True)
