@@ -309,7 +309,7 @@ def login_google():
     flow = Flow.from_client_secrets_file(
         'credentials.json',
         scopes=SCOPES,
-        redirect_uri='http://127.0.0.1:3000/oauth2callback'
+        redirect_uri=url_for('oauth2callback', _external=True)
     )
     
     authorization_url, state = flow.authorization_url(
@@ -330,7 +330,7 @@ def oauth2callback():
         'credentials.json',
         scopes=SCOPES,
         state=state,
-        redirect_uri='http://127.0.0.1:3000/oauth2callback'
+        redirect_uri=url_for('oauth2callback', _external=True)
     )
     
     flow.code_verifier = session.get('code_verifier')
